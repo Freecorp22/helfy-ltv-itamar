@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Where LTV Gets Built and Lost at Helfy</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #ffffff; color: #111111; padding: 2rem; max-width: 960px; margin: 0 auto; }
+
+  .brand-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-dot { width: 9px; height: 9px; border-radius: 50%; background: #1D9E75; flex-shrink: 0; }
+  .brand-name { font-size: 13px; font-weight: 600; color: #444441; letter-spacing: 0.05em; text-transform: uppercase; }
+  .badge { font-size: 13px; font-weight: 600; padding: 5px 14px; border-radius: 20px; background: #E1F5EE; color: #085041; border: 1px solid #5DCAA5; }
+
+  .hero { margin-bottom: 1.25rem; }
+  .hero h1 { font-size: 26px; font-weight: 600; color: #111111; line-height: 1.25; margin-bottom: 8px; }
+  .hero .sub { font-size: 16px; color: #3d3d3a; line-height: 1.6; }
+
+  .exec-frame { background: #EDECD5; border-radius: 12px; border: 1px solid #B4B2A9; padding: 18px 20px; margin-bottom: 1.25rem; }
+  .exec-frame p { font-size: 15px; color: #2c2c2a; line-height: 1.75; margin-bottom: 8px; }
+  .exec-frame p:last-child { margin-bottom: 0; }
+  .exec-frame strong { font-weight: 600; color: #111111; }
+
+  .pull-quote { border-left: 3px solid #1D9E75; padding: 10px 16px; margin: 1.25rem 0; }
+  .pull-quote p { font-size: 16px; font-weight: 600; color: #111111; line-height: 1.6; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.25rem; }
+  .col-card { background: #ffffff; border: 1px solid #B4B2A9; border-radius: 10px; padding: 16px 18px; }
+  .col-title { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #444441; margin-bottom: 12px; }
+  .item-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+  .item-list li { display: flex; gap: 10px; font-size: 14px; color: #2c2c2a; line-height: 1.55; }
+  .item-list li .n { font-size: 12px; font-weight: 600; min-width: 16px; padding-top: 2px; color: #888780; }
+
+  .levers { margin-bottom: 1.25rem; }
+  .levers-title { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #444441; margin-bottom: 6px; }
+  .lever { display: grid; grid-template-columns: 26px 1fr; gap: 10px; padding: 14px 16px; background: #ffffff; border: 1px solid #B4B2A9; border-radius: 8px; margin-bottom: 8px; }
+  .lever:last-child { margin-bottom: 0; }
+  .lever-n { font-size: 13px; font-weight: 600; color: #888780; padding-top: 2px; }
+  .lever-title { font-size: 15px; font-weight: 600; color: #111111; margin-bottom: 4px; }
+  .lever-body { font-size: 14px; color: #2c2c2a; line-height: 1.65; }
+
+  .bva { margin: 1.25rem 0; }
+  .bva-label { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #444441; margin-bottom: 10px; }
+  .bva-grid { display: grid; grid-template-columns: 1fr 40px 1fr; gap: 0; align-items: stretch; }
+  .bva-col { background: #ffffff; border: 1px solid #B4B2A9; border-radius: 10px; overflow: hidden; }
+  .bva-col.after { border-color: #1D9E75; border-width: 1.5px; }
+  .bva-head { padding: 11px 16px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  .bva-head.before { background: #F5C4B3; color: #711B13; }
+  .bva-head.after { background: #9FE1CB; color: #04342C; }
+  .bva-rows { padding: 8px 0; }
+  .bva-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 16px; font-size: 14px; color: #2c2c2a; line-height: 1.5; border-bottom: 1px solid #D3D1C7; }
+  .bva-row:last-child { border-bottom: none; }
+  .bva-row .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .dot-red { background: #993C1D; }
+  .dot-green { background: #0F6E56; }
+  .bva-arrow { display: flex; align-items: center; justify-content: center; font-size: 22px; color: #444441; }
+
+  .contrarian { padding: 22px 0; margin: 0 0 1.25rem; border-top: 1px solid #B4B2A9; border-bottom: 1px solid #B4B2A9; }
+  .contrarian-label { font-size: 12px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: #085041; margin-bottom: 14px; }
+  .contrarian p.first { font-size: 18px; font-weight: 600; color: #111111; line-height: 1.5; }
+  .contrarian p.second { margin-top: 10px; font-weight: 400; color: #2c2c2a; font-size: 15px; line-height: 1.75; }
+
+  .closing { margin-bottom: 1.25rem; }
+  .closing p.strong-line { font-size: 16px; font-weight: 600; color: #111111; margin-bottom: 4px; }
+  .closing p { font-size: 15px; color: #2c2c2a; line-height: 1.75; }
+  .closing p.shift { margin-top: 8px; font-size: 14px; color: #2c2c2a; }
+
+  .divider { border: none; border-top: 1px solid #B4B2A9; margin: 1.25rem 0; }
+
+  .relevance-title { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #444441; margin-bottom: 10px; }
+  .rel-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem; }
+  .rel-card { padding: 14px 16px; background: #ffffff; border: 1px solid #B4B2A9; border-radius: 8px; }
+  .rel-label { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #444441; margin-bottom: 7px; }
+  .rel-text { font-size: 14px; color: #2c2c2a; line-height: 1.6; }
+  .rel-num { font-weight: 600; color: #111111; }
+
+  .sources { padding: 12px 16px; background: #EDECD5; border-radius: 8px; border: 1px solid #B4B2A9; }
+  .sources-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #444441; margin-bottom: 6px; }
+  .sources-text { font-size: 13px; color: #2c2c2a; line-height: 1.7; }
+
+  @media (max-width: 640px) {
+    body { padding: 1rem; }
+    .two-col, .rel-row { grid-template-columns: 1fr; }
+    .bva-grid { grid-template-columns: 1fr; }
+    .bva-arrow { display: none; }
+    .lever { grid-template-columns: 26px 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="brand-row">
+  <div class="brand">
+    <div class="brand-dot"></div>
+    <span class="brand-name">Helfy <span style="font-weight:400;opacity:0.7;">(via DoktorABC)</span></span>
+  </div>
+  <span class="badge">Prepared by Itamar Freiman</span>
+</div>
+
+<div class="hero">
+  <h1>Where LTV Gets Built and Lost at Helfy</h1>
+  <p class="sub">An outside-in view on turning episodic care into compounding revenue.</p>
+</div>
+
+<div class="exec-frame">
+  <p>Helfy has already solved acquisition at scale: <strong>1M+ users driven through high-performance, condition-based funnels.</strong></p>
+  <p>The constraint is not growth but continuity. Converting episodic, condition-driven usage into repeat behavior and structured lifetime value.</p>
+  <p>The opportunity is to build lifecycle infrastructure that captures the inherent recurrence already present in these conditions.</p>
+</div>
+
+<div class="pull-quote">
+  <p>Helfy behaves like a transaction platform in a category where value is created through continuity.</p>
+</div>
+
+<div class="two-col">
+  <div class="col-card">
+    <div class="col-title">Where retention breaks</div>
+    <ul class="item-list">
+      <li><span class="n">1</span>Telehealth is episodic: industry retention averages ~30% annually</li>
+      <li><span class="n">2</span>Condition resolution drives natural churn: patient feels better, disappears</li>
+      <li><span class="n">3</span>No lifecycle converting inherent recurrence into repeat habit</li>
+      <li><span class="n">4</span>Loyalty and subscription nascent: flagged in VP JD as being built now</li>
+      <li><span class="n">5</span>Multi-market complexity fragments execution</li>
+    </ul>
+  </div>
+  <div class="col-card">
+    <div class="col-title">What is already working</div>
+    <ul class="item-list">
+      <li><span class="n">1</span>Acquisition solved: 1M+ users, strong paid engine, 128% traffic growth YoY</li>
+      <li><span class="n">2</span>Chronic-condition verticals (ED, hair loss, weight, acne) create inherent recurrence</li>
+      <li><span class="n">3</span>UK, France, Switzerland are OTC-only: frictionless repeat purchase, no consultation needed</li>
+    </ul>
+  </div>
+</div>
+
+<div class="levers">
+  <div class="levers-title">5 levers to unlock LTV</div>
+  <p style="font-size: 14px; color: #2c2c2a; line-height: 1.6; margin-bottom: 12px;">All five focus on one shift: from transaction triggers to continuity systems.</p>
+
+  <div class="lever">
+    <div class="lever-n">01</div>
+    <div>
+      <div class="lever-title">OTC markets are a retention arbitrage hiding in plain sight</div>
+      <div class="lever-body">Zero-friction reorder already exists in UK, France, and Switzerland. The gap is converting that into habit. The constraint is not mechanics, but trust. Retention in health must be built through clinical relevance, not behavioral pressure.</div>
+    </div>
+  </div>
+
+  <div class="lever">
+    <div class="lever-n">02</div>
+    <div>
+      <div class="lever-title">LTV is predictable at day one: segment early by condition type</div>
+      <div class="lever-body">A chronic-condition buyer is structurally different from a one-time acute buyer. Segment at first purchase. The high-LTV cohort needs a different engagement motion from the start, not a recovery motion after churn.</div>
+    </div>
+  </div>
+
+  <div class="lever">
+    <div class="lever-n">03</div>
+    <div>
+      <div class="lever-title">Loyalty should track health progress, not spend</div>
+      <div class="lever-body">In health, retention follows perceived progress, not discounts. Adherence milestones and health goals create stickiness a discount scheme cannot. It also positions DoktorABC as a long-term health partner, not a one-time shortcut.</div>
+    </div>
+  </div>
+
+  <div class="lever">
+    <div class="lever-n">04</div>
+    <div>
+      <div class="lever-title">Cross-condition expansion is the revenue engine</div>
+      <div class="lever-body">A patient treating ED is a strong candidate for weight, cardiovascular health, and sleep. Helfy's CEO framed it: "No infection comes alone." Adjacent conditions surfaced as proactive health suggestions, not ads, are where LTV compounds.</div>
+    </div>
+  </div>
+
+  <div class="lever">
+    <div class="lever-n">05</div>
+    <div>
+      <div class="lever-title">One strategy, four market-specific execution playbooks</div>
+      <div class="lever-body">OTC markets support direct re-engagement. Germany's prescription track requires framing the consultation as care continuity, not a purchase barrier. One strategic framework, locally adapted across UK, France, Switzerland, and Germany.</div>
+    </div>
+  </div>
+</div>
+
+<div class="bva">
+  <div class="bva-label">What changes when the lifecycle is built</div>
+  <div class="bva-grid">
+    <div class="bva-col">
+      <div class="bva-head before">Without lifecycle infrastructure</div>
+      <div class="bva-rows">
+        <div class="bva-row"><span class="dot dot-red"></span>One-time buyer, condition resolves, patient disappears</div>
+        <div class="bva-row"><span class="dot dot-red"></span>OTC frictionless reorder exists but nothing triggers it</div>
+        <div class="bva-row"><span class="dot dot-red"></span>All patients treated the same regardless of recurrence potential</div>
+        <div class="bva-row"><span class="dot dot-red"></span>Adjacent conditions go unaddressed, cross-sell never happens</div>
+        <div class="bva-row"><span class="dot dot-red"></span>Loyalty is a discount coupon, not a health relationship</div>
+      </div>
+    </div>
+    <div class="bva-arrow">&#8594;</div>
+    <div class="bva-col after">
+      <div class="bva-head after">With lifecycle infrastructure</div>
+      <div class="bva-rows">
+        <div class="bva-row"><span class="dot dot-green"></span>Condition resolution becomes a re-engagement trigger, not an exit</div>
+        <div class="bva-row"><span class="dot dot-green"></span>OTC reorder prompted at the right behavioral moment, per market</div>
+        <div class="bva-row"><span class="dot dot-green"></span>High-LTV cohort identified at day one, different motion from the start</div>
+        <div class="bva-row"><span class="dot dot-green"></span>Adjacent conditions surfaced contextually: LTV compounds across portfolio</div>
+        <div class="bva-row"><span class="dot dot-green"></span>Loyalty tracks health progress: platform becomes part of health narrative</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="contrarian">
+  <div class="contrarian-label">Contrarian insight</div>
+  <p class="first">Patients do not return because of reminders or discounts.</p>
+  <p class="second">They return when the platform becomes part of their <strong>ongoing health narrative</strong>. The retention infrastructure Helfy needs is not a CRM campaign layer. It is a value perception layer that makes every interaction feel like care, not commerce.</p>
+</div>
+
+<div class="closing">
+  <p class="strong-line">With acquisition already working at scale, Helfy does not need more customers.</p>
+  <p>It needs to extract more value from the ones it already has.</p>
+  <p class="shift">That shift, from transactions to continuity, is where LTV compounds.</p>
+</div>
+
+<div class="divider"></div>
+
+<div class="relevance-title">Where I've done this before</div>
+<div class="rel-row">
+  <div class="rel-card">
+    <div class="rel-label">Regulated B2C at scale</div>
+    <div class="rel-text">Sweetch: lifecycle and engagement for <span class="rel-num">350,000+ patients</span> on GLP-1 programs (obesity, diabetes) across EU and US pharma. Behavioral analytics and adherence intervention in a compliance-sensitive environment.</div>
+  </div>
+  <div class="rel-card">
+    <div class="rel-label">High-volume retention</div>
+    <div class="rel-text">Matomy (AdTech): retention across <span class="rel-num">2,400+ accounts</span> where revenue was tied to real-time behavioral data at high velocity. Segmentation and cohort analytics. <span class="rel-num">123% NRR</span> and EUR 6M incremental revenue.</div>
+  </div>
+  <div class="rel-card">
+    <div class="rel-label">Lifecycle design from scratch</div>
+    <div class="rel-text">Userlane: NRR from <span class="rel-num">94% to 109%</span>, churn reduced 18%, TTV cut 45%. Built health scoring, segmentation, and tiered engagement models from zero.</div>
+  </div>
+</div>
+
+<div class="sources">
+  <div class="sources-label">Sources</div>
+  <div class="sources-text">Helfy careers page and VP JD, DoktorABC market pages (UK, FR, CH, DE), Similarweb Digital 100 2025, Trustpilot (30,000+ reviews), public LinkedIn signals, telehealth retention benchmarks (~30% annually, Propel / ProfitWell).</div>
+</div>
+
+</body>
+</html>
